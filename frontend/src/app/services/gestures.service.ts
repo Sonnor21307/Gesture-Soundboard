@@ -12,18 +12,19 @@ export class GesturesService {
   constructor(private http: HttpClient) {
   }
 
-  public addGesture(username : string, audio_file: any, gesture : string){
+  public addGesture(username : string, audio_file: string, gesture : string){
     var fd = new FormData()
-    fd.append('audio',audio_file)
+    fd.append('audio_name',audio_file)
     fd.append('gesture', gesture)
+    console.log(username, gesture, audio_file);
     return this.http.post<Gesture>(
       `${this.apiUrl}gesture/${username}/create`, fd
     )
   }
 
-  public getGestures(username : string, gesture : string){
+  public getGestures(username : string){
     return this.http.get<Gesture[]>(
-      `${this.apiUrl}gesture/${username}/${gesture}`
+      `${this.apiUrl}gesture/${username}/all`
     )
   }
 

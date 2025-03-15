@@ -56,10 +56,10 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="absolute pointer-events-none right-4 top-8 size-5">
                                     <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
                                 </svg>
-                                <select id="os" name="os" class="w-full appearance-none rounded-radius border border-outline bg-surface-alt px-4 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-75 dark:border-outline-dark dark:bg-surface-dark-alt/50 dark:focus-visible:outline-primary-dark">
+                                <select (change)="updateGestureAudio($event, gestureInfo)" id="os" name="os" class="w-full appearance-none rounded-radius border border-outline bg-surface-alt px-4 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-75 dark:border-outline-dark dark:bg-surface-dark-alt/50 dark:focus-visible:outline-primary-dark">
                                     <option selected></option>
-                                    @for (audio of audios; track audio.name) {
-                                        <option value=audio>{{ audio.name }}</option>
+                                    @for (audio of audios; track audio.audio_name) {
+                                        <option [attr.selected]="gestureInfo.audio_name === audio.audio_name ? '' : null" [value]="audio.audio_name">{{ audio.audio_name }}</option>
                                     }
                                 </select>
                             </div>                        
@@ -67,7 +67,6 @@
                     }
                 </div>
             }
-            
         </div>
     </div>
 
@@ -75,14 +74,20 @@
 
     <div class="w-full text-center">
         <h2 class="text-3xl text-on-surface-dark-strong">Audio Library</h2>
-        <div>
+        <button (click)="uploadAudioModalOpen=true" class="cursor-pointer text-info dark:text-on-info font-bold underline">
+            Upload
+        </button>
+
+        <div class="mt-4 ms-4 me-4 text-left">
             @if (audios.length === 0) {
                 <p class="mt-1">You haven't uploaded any audio files.</p>
+            } @else {
+                @for (audio of audios; track audio.audio_name) {
+                    <p (click)="playAudio(audio.url)" class="mb-2 cursor-pointer bg-surface-dark-alt px-4 py-2 rounded-full">- {{ audio.audio_name }}</p>
+                }
             }
 
-            <button (click)="uploadAudioModalOpen=true" class="cursor-pointer text-info dark:text-on-info font-bold underline">
-                Upload
-            </button>
+            
             
         </div>
     </div>

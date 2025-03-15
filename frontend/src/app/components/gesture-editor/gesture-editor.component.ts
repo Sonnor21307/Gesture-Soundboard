@@ -1,25 +1,18 @@
 import { Component } from '@angular/core';
 import { ModalComponent } from '../modal/modal.component';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { GesturesService } from '../../services/gestures.service';
 import { AuthService } from '../../services/auth.service';
+import  { Audio, Gesture } from '../../models/models'
+import { AudioService } from '../../services/audio.service';
 
-interface GestureInfo {
-  gesture: string,
-  audio: string,
-}
-
-interface Audio {
-  name: string,
-  link: string,
-}
 
 @Component({
   selector: 'app-gesture-editor',
   standalone: true,
-  imports: [ModalComponent, ReactiveFormsModule, CommonModule],
+  imports: [ModalComponent, ReactiveFormsModule, CommonModule, FormsModule],
   templateUrl: './gesture-editor.component.html',
   styleUrl: './gesture-editor.component.css'
 })
@@ -27,15 +20,41 @@ export class GestureEditorComponent {
   uploadAudioModalOpen = false;
   uploadForm!: FormGroup;
 
-  constructor(private fb: FormBuilder, private gestureService: GesturesService, private authService: AuthService) {}
+  constructor(private fb: FormBuilder, private gestureService: GesturesService, private authService: AuthService, private audioService: AudioService) {}
 
   audios: Audio[] = [];
-  gestures: GestureInfo[]  = [
-    {
-      gesture: "OpenPalm",
-      audio: "Fart",
-    }
-  ];
+  gestures: Gesture[]  = [];
+  possibleGestures = [
+    "ClosedFist",
+    "ILoveYou",
+    "OpenPalm",
+    "PointingUp",
+    "ThumbDown",
+    "ThumbUp",
+    "Victory"
+  ]
+
+  updateGestureAudio(event: Event, gestureInfo: any) {
+    const username = this.authService.getUsername();
+    if (!username) return;
+
+    const target = event.target as HTMLSelectElement;
+    const selectedAudio = target.value;
+    console.log('Selected audio:', selectedAudio);
+    console.log('Gesture Info:', gestureInfo);
+  
+    this.gestureService.addGesture(username, selectedAudio, gestureInfo.gesture).subscribe(response => {
+      console.log('Added', response);
+    }, error => {
+      console.error('Failed to add gesture', error);
+    });
+
+  }
+  
+
+  playAudio(url: string) {
+    this.audioService.playAudio(url);
+  }
 
   ngOnInit() {
     const username = this.authService.getUsername();
@@ -46,9 +65,36 @@ export class GestureEditorComponent {
 
     this.createForm();
     this.gestureService.getAudios(username).subscribe(response => {
+      this.audios = response;
       console.log('Got', response);
     }, error => {
       console.error('Failed to get audios', error);
+    });
+
+    this.gestureService.getGestures(username).subscribe(response => {
+      this.gestures = response;
+      console.log(response);
+
+      // add missing gestures
+      for (const gesture of this.possibleGestures) {
+        let found = false;
+
+        for (const gestureInfo of this.gestures) {
+          if (gestureInfo.gesture === gesture) {
+            found = true;
+          }
+        }
+
+        if (!found) {
+          this.gestures.push({
+            gesture: gesture,
+            url: '',
+            audio_name: '',
+          })
+        }
+      }
+    }, error => {
+      console.error('Failed to get gestures', error);
     });
   }
 
