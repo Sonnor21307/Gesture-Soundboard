@@ -62,9 +62,12 @@ def upload_gesture(request,username):
 
 @api_view(['DELETE'])
 def delete_gesture(request,username,gesture):
-    user = User.objects.get(username=username)
-    gesture = user.gesture_set.get(gesture=gesture)
-    gesture.delete()
+    try:
+        user = User.objects.get(username=username)
+        gesture = user.gesture_set.get(gesture=gesture)
+        gesture.delete()
+    except Exception as e:
+        print(e)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['POST'])
