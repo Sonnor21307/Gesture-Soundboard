@@ -37,7 +37,7 @@
     </app-modal>
 }
 
-<div class="flex mt-4 h-screen text-on-surface-dark">
+<div class="overflow-y-auto max-h-[calc(100vh-80px)] h-screen pb-[80px] flex gap-6 md:gap-0 mt-4 text-on-surface-dark flex-col md:flex-row">
     <div class="w-full text-center">
         <h2 class="text-3xl text-on-surface-dark-strong">Gestures</h2>
         <div>
@@ -70,7 +70,7 @@
         </div>
     </div>
 
-    <div class="border-1 border-on-surface-dark/25 h-[85%] mx-2"></div>
+    <div class="border-1 border-on-surface-dark/25 h-[100%] mt-auto mb-auto mx-2"></div>
 
     <div class="w-full text-center">
         <h2 class="text-3xl text-on-surface-dark-strong">Audio Library</h2>
@@ -83,7 +83,7 @@
                 <p class="mt-1">You haven't uploaded any audio files.</p>
             } @else {
                 @for (audio of audios; track audio.audio_name) {
-                    <p (click)="playAudio(audio.url)" class="mb-2 cursor-pointer bg-surface-dark-alt px-4 py-2 rounded-full">- {{ audio.audio_name }}</p>
+                    <p (click)="playAudio(audio.url)" class="hover:bg-surface-alt/10 mb-2 cursor-pointer bg-surface-dark-alt px-4 py-2 rounded-full">- {{ audio.audio_name }}</p>
                 }
             }
 
