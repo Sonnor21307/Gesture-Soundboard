@@ -13,7 +13,16 @@ import { CommonModule } from '@angular/common';
 })
 export class AuthComponent {
   isLogin = true;
+  loggedIn = false;
   authForm!: FormGroup;
+
+  ngOnInit() {
+    this.loggedIn = this.authService.isLoggedIn();
+  }
+
+  logout() {
+    this.authService.logout();
+  }
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.createForm();
@@ -71,36 +80,30 @@ export class AuthComponent {
 
     if (this.isLogin) {
       console.log('Logging in:', { username, password });
-      // this.authService.loginUser({ username, password }).subscribe(
-      //   (response) => {
-          
-      //     localStorage.setItem('access_token', response.access);
-      //     localStorage.setItem('refresh_token', response.refresh);
-      //     localStorage.setItem('username', username); 
-
-      //     console.log('Login successful');
-      //     this.router.navigate(['/profile']);
-      //     window.location.reload();
-
-      //   },
-      //   (error) => {
-      //     // TODO: display incorrect credentials notification
-      //     console.error('Login failed', error);
-      //   }
-      // );
+      this.authService.login(username, password).subscribe(
+        (response) => {
+          localStorage.setItem('username', username); 
+          console.log('Login successful');
+          window.location.reload();
+        },
+        (error) => {
+          alert('Something went wrong');
+          console.error('Login failed', error);
+        }
+      );
     } else {
       console.log('Signing up:', { username, password });
-      // this.authService.registerUser({ username, password }).subscribe(
-      //   (response) => {
-      //     console.log('Registration successful', response);
-      //     alert('Registration successful!');
-      //     this.toggleAuth();
-      //   },
-      //   (error) => {
-      //     alert('Registration failed. Check console for errors.');
-      //     console.error('Registration failed', error);
-      //   }
-      // );
+      this.authService.register(username, password).subscribe(
+        (response) => {
+          console.log('Registration successful', response);
+          alert('Registration successful!');
+          this.toggleAuth();
+        },
+        (error) => {
+          alert('Registration failed. Check console for errors.');
+          console.error('Registration failed', error);
+        }
+      );
     }
   }
 }
