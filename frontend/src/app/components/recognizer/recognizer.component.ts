@@ -22,7 +22,7 @@ export class RecognizerComponent {
   recognizedGesture = "none";
   gestures: Gesture[] = [];
 
-    constructor(private gestureService: GesturesService, private audioService: AudioService, private authService: AuthService) {}
+  constructor(private gestureService: GesturesService, private audioService: AudioService, private authService: AuthService) {}
 
 
   landmarkNames = [
@@ -173,7 +173,7 @@ export class RecognizerComponent {
             // console.log(truncatedLandmarks);
 
             if (this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0], gestureRecognitionResult.handedness)) {
-              this.recognizedGesture = 'horizontal thumbs up';
+              this.recognizedGesture = 'Horizontal_Thumbs_Up';
             }
 
             // console.log(this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0]))

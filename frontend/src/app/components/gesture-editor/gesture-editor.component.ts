@@ -31,7 +31,8 @@ export class GestureEditorComponent {
     "Pointing_Up",
     "Thumb_Down",
     "Thumb_Up",
-    "Victory"
+    "Victory",
+    "Horizontal_Thumbs_Up"
   ]
 
   updateGestureAudio(event: Event, gestureInfo: any) {
