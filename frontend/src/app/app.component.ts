@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  title = 'frontend';
+  title = 'Gesture Soundboard';
   selectedTab = "Camera"
 
   switchTab(name: string) {

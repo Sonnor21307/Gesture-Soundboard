@@ -1,1 +1,89 @@
-<p>gesture-editor works!</p>
+@if (uploadAudioModalOpen) {
+    <app-modal 
+        text=""
+        (close)="uploadAudioModalOpen=false"
+        (submit)="uploadAudio()"
+        >
+        <form [formGroup]="uploadForm">
+            <div class="block">
+                <div class="mb-4">
+                    <label class="flex w-fit items-center gap-1 pl-0.5 text-sm"
+                        [ngClass]="usernameInvalid ? 'text-danger' : 'text-on-surface dark:text-on-surface-dark'">
+                        <ng-container *ngIf="usernameInvalid">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"
+                                fill="currentColor" class="w-4 h-4">
+                                <path
+                                    d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z" />
+                            </svg>
+                        </ng-container>
+                        Audio Name
+                    </label>
+                    <input [ngClass]="{'border-danger': usernameInvalid}" type="text" formControlName="username"
+                        class="w-full p-2 mt-1 border border-on-surface rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark focus:ring-2 focus:ring-outline dark:focus:ring-outline-dark">
+                    <ng-container *ngIf="usernameInvalid">
+                        <small class="pl-0.5 text-danger">Error: Username is required</small>
+                    </ng-container>
+                </div>
+
+                <div class="mb-4">
+                    <div class="relative flex w-full flex-col gap-1">
+                        <label class="w-fit pl-0.5 text-sm text-on-surface dark:text-on-surface-dark" for="fileInput">Upload File</label>
+                        <input (change)="onFileSelected($event)" accept="audio/*" required id="fileInput" type="file" class="w-full overflow-clip border border-on-surface rounded outline-none bg-surface dark:bg-surface-dark text-on-surface dark:text-on-surface-dark text-sm text-on-surface file:mr-4 file:border-none file:bg-surface-alt file:px-4 file:py-2 file:font-medium file:text-on-surface-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-75 dark:border-outline-dark  dark:file:bg-surface-dark-alt/75 dark:file:text-on-surface-dark-strong dark:focus-visible:outline-primary-dark" />
+                    </div>
+                </div>
+            </div>
+        </form>
+          
+    </app-modal>
+}
+
+<div class="flex mt-4 h-screen text-on-surface-dark">
+    <div class="w-full text-center">
+        <h2 class="text-3xl text-on-surface-dark-strong">Gestures</h2>
+        <div>
+            @if (gestures.length === 0) {
+                <p class="mt-1">You haven't assigned any gestures.</p>
+            } @else {
+                <div class="flex justify-center items-center w-full gap-4 flex-wrap">
+                    @for (gestureInfo of gestures; track gestureInfo.gesture) {
+                        <div class="h-full flex gap-4 items-center w-full max-w-3xl mx-4">
+                            <div class="text-left">
+                                <!-- <label for="os" class="w-fit pl-0.5 text-sm">Gesture</label> -->
+                                <img class="object-contain rounded-xl w-20 h-20" [src]="'images/' + gestureInfo.gesture + '.png'" alt="Gesture Image">
+                            </div>
+                            <div class="relative flex w-full flex-col gap-1 text-on-surface dark:text-on-surface-dark">
+                                <label for="os" class="w-fit pl-0.5 text-sm">Audio Name</label>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="absolute pointer-events-none right-4 top-8 size-5">
+                                    <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                                </svg>
+                                <select id="os" name="os" class="w-full appearance-none rounded-radius border border-outline bg-surface-alt px-4 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-75 dark:border-outline-dark dark:bg-surface-dark-alt/50 dark:focus-visible:outline-primary-dark">
+                                    <option selected></option>
+                                    @for (audio of audios; track audio.name) {
+                                        <option value=audio>{{ audio.name }}</option>
+                                    }
+                                </select>
+                            </div>                        
+                        </div>
+                    }
+                </div>
+            }
+            
+        </div>
+    </div>
+
+    <div class="border-1 border-on-surface-dark/25 h-[85%] mx-2"></div>
+
+    <div class="w-full text-center">
+        <h2 class="text-3xl text-on-surface-dark-strong">Audio Library</h2>
+        <div>
+            @if (audios.length === 0) {
+                <p class="mt-1">You haven't uploaded any audio files.</p>
+            }
+
+            <button (click)="uploadAudioModalOpen=true" class="cursor-pointer text-info dark:text-on-info font-bold underline">
+                Upload
+            </button>
+            
+        </div>
+    </div>
+</div>
