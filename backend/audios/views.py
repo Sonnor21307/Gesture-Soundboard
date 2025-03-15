@@ -76,6 +76,8 @@ def upload_audio(request, username):
     blob.upload_from_file(file_obj=audio_file, content_type='audio/mpeg')
 
     user = User.objects.get(username=username)
+    if(user.audio_set.filter(name=audio_name).exists()):
+        return Response({"error":"audio file already exists"}, status=status.HTTP_400_BAD_REQUEST)
     user.audio_set.create(name=audio_name, file=filename)
 
     return Response({"url": base_url + filename, "audio_name":audio_name}, status=status.HTTP_201_CREATED)
