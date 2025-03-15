@@ -11,4 +11,9 @@ import { RouterLink } from '@angular/router';
 })
 export class AppComponent {
   title = 'frontend';
+  selectedTab = "Camera"
+
+  switchTab(name: string) {
+    this.selectedTab = name;
+  }
 }
