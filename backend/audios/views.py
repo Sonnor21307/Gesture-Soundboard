@@ -47,6 +47,7 @@ def get_gesture(request,username,gesture):
 def upload_gesture(request,username):
 
     audio_file = request.data.get('audio')
+    gesture = request.data.get('gesture')
 
     credentials = service_account.Credentials.from_service_account_info(creds)
     client = storage.Client(credentials=credentials, project=creds["project_id"])
@@ -57,9 +58,8 @@ def upload_gesture(request,username):
     blob.upload_from_file(file_obj=audio_file, content_type='audio/mpeg')
 
     user = User.objects.get(username=username)
-    gesture = user.gesture_set.create(audio_name=filename, gesture="closed_fist")
-    print(gesture)
-    return Response({"url": base_url + gesture.audio_name}, status=status.HTTP_201_CREATED)
+    gesture_obj = user.gesture_set.create(audio_name=filename, gesture=gesture)
+    return Response({"url": base_url + gesture_obj.audio_name}, status=status.HTTP_201_CREATED)
 
 @api_view(['DELETE'])
 def delete_gesture(request,username,gesture):

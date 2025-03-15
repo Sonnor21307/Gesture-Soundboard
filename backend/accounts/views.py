@@ -16,14 +16,14 @@ def login(request):
     if not user.check_password(password):
         return Response({'error': 'Invalid username or password'}, status=status.HTTP_403_FORBIDDEN)
     else:
-        return Response(status=status.HTTP_200_OK)
+        return Response({"username":user.username},status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def signup(request):
     username=request.data['username']
     password=request.data['password']
-    user = User.objects.create_user(username=username, password=password)
-    return Response(user, status=status.HTTP_201_CREATED)
+    User.objects.create_user(username=username, password=password)
+    return Response(status=status.HTTP_201_CREATED)
 
 @api_view(['PUT'])
 def update_user(request):
