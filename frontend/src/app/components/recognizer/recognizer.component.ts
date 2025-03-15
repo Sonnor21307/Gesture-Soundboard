@@ -52,16 +52,19 @@ export class RecognizerComponent {
       this.initCamera();
     }
   }
-  
+
+
+
   isThumbsUpHorizontal(landmarks: { x: number; y: number; z: number }[]): boolean {
     if (!landmarks || landmarks.length < 21) return false;
-  
+
+
     const thumbBase = landmarks[0];
-    const thumbStart = landmarks[1]; 
-    const thumbMid1 = landmarks[2];  
-    const thumbMid2 = landmarks[3];  
-    const thumbTip = landmarks[4]; 
-  
+    const thumbStart = landmarks[1];
+    const thumbMid1 = landmarks[2];
+    const thumbMid2 = landmarks[3];
+    const thumbTip = landmarks[4];
+
     const indexJoint1 = landmarks[6]
     const middleJoint1 = landmarks[10]
     const ringJoint1 = landmarks[14]
@@ -72,22 +75,21 @@ export class RecognizerComponent {
     const ringKnuckle = landmarks[13]
     const pinkyKnuckle = landmarks[17]
 
-    
-    const indexTip = landmarks[8];  
-    const middleTip = landmarks[12]; 
-    const ringTip = landmarks[16];   
-    const pinkyTip = landmarks[20];  
-  
-    const thumbExtended = 
-      thumbTip.x < thumbMid2.x && 
-      thumbMid2.x < thumbMid1.x && 
-      thumbMid1.x < thumbStart.x; 
-  
-    const thumbHorizontal = 
-      Math.abs(thumbTip.y - thumbStart.y) < 0.2; 
-  
+    const indexTip = landmarks[8];
+    const middleTip = landmarks[12];
+    const ringTip = landmarks[16];
+    const pinkyTip = landmarks[20];
+
+    const thumbExtended =
+      thumbTip.x < thumbMid2.x &&
+      thumbMid2.x < thumbMid1.x &&
+      thumbMid1.x < thumbStart.x;
+
+    const thumbHorizontal =
+      Math.abs(thumbTip.y - thumbStart.y) < 0.2;
+
     // check if first joint is lower than second knuckle
-    const fingersCurled = 
+    const fingersCurled =
         indexJoint1.y > indexKnuckle.y &&
         middleJoint1.y > middleKnuckle.y &&
         ringJoint1.y > ringKnuckle.y &&
@@ -95,7 +97,7 @@ export class RecognizerComponent {
 
     return thumbExtended && thumbHorizontal && fingersCurled;
   }
-  
+
 
   lastProcessedTime = 0;
   debounceTime = 1000;
@@ -124,7 +126,7 @@ export class RecognizerComponent {
               y: parseFloat(landmark.y.toFixed(2)),
               z: parseFloat(landmark.z.toFixed(2))
             }));
-          
+
             // console.log(truncatedLandmarks[8].y, truncatedLandmarks[0].y)
             // console.log(truncatedLandmarks);
 
@@ -137,14 +139,14 @@ export class RecognizerComponent {
             // try faster again
             this.lastProcessedTime = 0;
           }
-          
+
         }
       },
     });
-  
+
     this.camera.start();
     this.cameraOn = true;
   }
-  
+
 
 }

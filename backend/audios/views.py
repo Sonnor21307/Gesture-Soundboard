@@ -42,7 +42,7 @@ def get_gestures(request,username):
     user = User.objects.get(username=username)
     list_of_gestures = list()
     for gesture in user.gesture_set.all():
-        list_of_gestures.append({"gesture": gesture.gesture, "url": base_url + gesture.audio.file})
+        list_of_gestures.append({"gesture": gesture.gesture, "audio_name":gesture.audio.name, "url": base_url + gesture.audio.file})
     return Response(list_of_gestures, status=status.HTTP_200_OK)
 
 
@@ -71,7 +71,7 @@ def upload_audio(request, username):
     client = storage.Client(credentials=credentials, project=creds["project_id"])
 
     bucket = client.get_bucket('audio21307')
-    filename = username + "&" + audio_name
+    filename = username + "&" + audio_file
     blob = bucket.blob(filename)
     blob.upload_from_file(file_obj=audio_file, content_type='audio/mpeg')
 
