@@ -19,15 +19,24 @@ export class GesturesService {
     )
   }
 
-  public addGesture(username : string, audio_file: any){
+  public addGesture(username : string, audio_file: any, gesture : string){
     var fd = new FormData()
     fd.append('audio',audio_file)
-
+    fd.append('gesture', gesture)
     return this.http.post<string>(
       `${this.apiUrl}gesture/${username}/create`, fd
     )
   }
 
-  public getGesture(username : string, gesture : string)
+  public getGesture(username : string, gesture : string){
+    return this.http.get<string>(
+      `${this.apiUrl}gesture/${username}/${gesture}`
+    )
+  }
 
+  public deleteGesture(username : string, gesture : string){
+    return this.http.delete(
+      `${this.apiUrl}gesture/${username}/${gesture}/delete`
+    )
+  }
 }
