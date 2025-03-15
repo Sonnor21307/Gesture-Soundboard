@@ -53,17 +53,10 @@ def upload_gesture(request,username):
     user = User.objects.get(username=username)
     audio = user.audio_set.get(name=audio_name)
     if(audio.gesture_set.filter(gesture=gesture).exists()):
-        gesture_obj = audio.gesture_set.get(gesture=gesture)
-        gesture_obj.gesture = gesture
-        gesture_obj.save()
+        gesture = audio.gesture_set.get(gesture=gesture)
+        gesture.gesture = gesture
+        gesture.save()
         return Response({"url": base_url + audio.file}, status=status.HTTP_201_CREATED)
-    if(user.gesture_set.filter(name=audio_name).exists()):
-        audio = user.audio_set.get(name=audio_name)
-        gesture_obj= user.gesture_set.get(gesture=gesture)
-        gesture_obj.audio = audio
-        gesture_obj.save()
-        return Response({"url": base_url + audio.file}, status=status.HTTP_201_CREATED)
-
     audio.gesture_set.create(gesture=gesture, user=user)
     return Response({"url": base_url + audio.file}, status=status.HTTP_201_CREATED)
 
