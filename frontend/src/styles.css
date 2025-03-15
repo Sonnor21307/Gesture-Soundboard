@@ -1,9 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 
 @theme {
     /* font */
-    --font-display: "Lato", "sans-serif";
+    --font-display: "Lexend";
     --font-sans: var(--font-display);
 
     /* light theme */
