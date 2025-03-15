@@ -52,6 +52,11 @@ def upload_gesture(request,username):
     audio_name = request.data.get('audio_name')
     user = User.objects.get(username=username)
     audio = user.audio_set.get(name=audio_name)
+    if(audio.gesture_set.filter(name=gesture).exists()):
+        gesture = audio.gesture_set.get(name=gesture)
+        gesture.gesture = gesture
+        gesture.save()
+        return Response({"url": base_url + audio.file}, status=status.HTTP_201_CREATED)
     audio.gesture_set.create(gesture=gesture, user=user)
     return Response({"url": base_url + audio.file}, status=status.HTTP_201_CREATED)
 
@@ -76,6 +81,12 @@ def upload_audio(request, username):
     blob.upload_from_file(file_obj=audio_file, content_type='audio/mpeg')
 
     user = User.objects.get(username=username)
+    if(user.audio_set.filter(name=audio_name).exists()):
+        audio = user.audio_set.filter(name=audio_name)
+        audio.name = audio_name
+        audio.file = audio_file
+        audio.save()
+        return Response({"url": base_url + filename, "audio_name":audio_name}, status=status.HTTP_201_CREATED)
     user.audio_set.create(name=audio_name, file=filename)
 
     return Response({"url": base_url + filename, "audio_name":audio_name}, status=status.HTTP_201_CREATED)
