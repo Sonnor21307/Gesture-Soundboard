@@ -52,7 +52,7 @@ def upload_gesture(request,username):
     audio_name = request.data.get('audio_name')
     user = User.objects.get(username=username)
     audio = user.audio_set.get(name=audio_name)
-    if(audio.gesture_set.filter(gesture=gesture).exists()):
+    if(audio.gesture_set.filter(gesture=gesture).exists() or user.audio_set.filter(name=audio_name).exists()):
         gesture = audio.gesture_set.get(gesture=gesture)
         gesture.gesture = gesture
         gesture.save()
