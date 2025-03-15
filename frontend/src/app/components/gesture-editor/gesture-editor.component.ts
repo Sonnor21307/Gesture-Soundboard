@@ -3,6 +3,8 @@ import { ModalComponent } from '../modal/modal.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { GesturesService } from '../../services/gestures.service';
+import { AuthService } from '../../services/auth.service';
 
 interface GestureInfo {
   gesture: string,
@@ -25,7 +27,7 @@ export class GestureEditorComponent {
   uploadAudioModalOpen = false;
   uploadForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private gestureService: GesturesService, private authService: AuthService) {}
 
   audios: Audio[] = [];
   gestures: GestureInfo[]  = [
@@ -36,7 +38,18 @@ export class GestureEditorComponent {
   ];
 
   ngOnInit() {
+    const username = this.authService.getUsername();
+    if (!username) {
+      console.log("no user");
+      return;
+    }
+
     this.createForm();
+    this.gestureService.getAudios(username).subscribe(response => {
+      console.log('Got', response);
+    }, error => {
+      console.error('Failed to get audios', error);
+    });
   }
 
   private createForm() {
@@ -67,16 +80,17 @@ export class GestureEditorComponent {
   }  
 
   uploadAudio() {
+    const username = this.authService.getUsername();
+    if (!username) return;
+
     if (this.uploadForm.valid) {
-      const formData = new FormData();
-      formData.append('name', this.uploadForm.value.name);
-      formData.append('audioFile', this.uploadForm.value.audioFile);
-      console.log(formData);
-      // this.uploadService.uploadAudio(formData).subscribe(response => {
-      //   console.log('Upload successful', response);
-      // }, error => {
-      //   console.error('Upload failed', error);
-      // });
+      this.gestureService.addAudio(username, this.uploadForm.value.name, this.uploadForm.value.audioFile).subscribe(response => {
+        console.log('Upload successful', response);
+        alert("Upload successful!");
+        window.location.reload();
+      }, error => {
+        console.error('Upload failed', error);
+      });
     }
   }
 }

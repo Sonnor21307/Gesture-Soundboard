@@ -25,6 +25,15 @@ export class AuthService {
     return false;
   }
 
+  public getUsername() {
+    const username = localStorage.getItem('username');
+    if (username) { 
+      return username;
+    }
+
+    return null;
+  }
+
   public register(username: string, password: string) {
     console.log(username, password, this.apiUrl);
     return this.http.post(`${this.apiUrl}accounts/create`, {
