@@ -22,5 +22,5 @@ class Gesture(models.Model):
     audio = models.ForeignKey(Audio, on_delete=models.CASCADE)
     gesture = models.TextField()
 
-    class Meta:
-        unique_together = ('user', 'gesture')
+    # class Meta:
+    #     unique_together = ('user', 'gesture')
