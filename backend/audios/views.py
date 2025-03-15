@@ -71,7 +71,7 @@ def upload_audio(request, username):
     client = storage.Client(credentials=credentials, project=creds["project_id"])
 
     bucket = client.get_bucket('audio21307')
-    filename = username + "&" + audio_file
+    filename = username + "&" + str(audio_file)
     blob = bucket.blob(filename)
     blob.upload_from_file(file_obj=audio_file, content_type='audio/mpeg')
 
