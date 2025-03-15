@@ -25,12 +25,12 @@ export class GestureEditorComponent {
   audios: Audio[] = [];
   gestures: Gesture[]  = [];
   possibleGestures = [
-    "ClosedFist",
+    "Closed_Fist",
     "ILoveYou",
-    "OpenPalm",
-    "PointingUp",
-    "ThumbDown",
-    "ThumbUp",
+    "Open_Palm",
+    "Pointing_Up",
+    "Thumb_Down",
+    "Thumb_Up",
     "Victory"
   ]
 

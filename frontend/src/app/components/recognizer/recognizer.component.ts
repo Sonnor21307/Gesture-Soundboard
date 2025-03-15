@@ -1,6 +1,10 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Camera } from '@mediapipe/camera_utils';
 import { FilesetResolver, GestureRecognizer } from '@mediapipe/tasks-vision'
+import { Gesture } from '../../models/models';
+import { AudioService } from '../../services/audio.service';
+import { GesturesService } from '../../services/gestures.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-recognizer',
@@ -14,7 +18,12 @@ export class RecognizerComponent {
   private camera!: Camera;
   private gestureRecognizer!: GestureRecognizer;
   cameraOn = false;
+  lastPlayTime = 0;
   recognizedGesture = "none";
+  gestures: Gesture[] = [];
+
+    constructor(private gestureService: GesturesService, private audioService: AudioService, private authService: AuthService) {}
+
 
   landmarkNames = [
     "palmBase", "thumbStart", "thumbMid1", "thumbMid2", "thumbTip",
@@ -25,7 +34,17 @@ export class RecognizerComponent {
   ];
 
   ngOnInit(): void {
+    const username = this.authService.getUsername();
+    if (!username) return;
+
     this.initMediaPipe();
+
+    this.gestureService.getGestures(username).subscribe(response => {
+      this.gestures = response;
+      console.log(response);
+    }, error => {
+      console.error('Failed to get gestures', error);
+    });
   }
 
   private async initMediaPipe() {
@@ -128,6 +147,7 @@ export class RecognizerComponent {
       onFrame: async () => {
         const now = performance.now();
         if (now - this.lastProcessedTime >= this.debounceTime) {
+          this.recognizedGesture = "none";
           this.lastProcessedTime = now;
           const gestureRecognitionResult = this.gestureRecognizer.recognize(this.videoElement.nativeElement);
           let gestureFound = false;
@@ -141,7 +161,7 @@ export class RecognizerComponent {
           }
 
           if (!gestureFound && gestureRecognitionResult.landmarks.length > 0) {
-            this.recognizedGesture = "none";
+            
             const truncatedLandmarks = gestureRecognitionResult.landmarks[0].map((landmark, index) => ({
               part: this.landmarkNames[index],
               x: parseFloat(landmark.x.toFixed(2)),
@@ -155,13 +175,27 @@ export class RecognizerComponent {
             if (this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0], gestureRecognitionResult.handedness)) {
               this.recognizedGesture = 'horizontal thumbs up';
             }
+
             // console.log(this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0]))
           } else {
-            console.log("what happened");
+            //console.log("no hand recognized");
             // try faster again
             this.lastProcessedTime = 0;
           }
 
+          if (now - this.lastPlayTime > 2000) {
+            
+
+            for (const gesture of this.gestures) {
+              if (gesture.gesture === this.recognizedGesture) {
+                this.audioService.playAudio(gesture.url);
+                console.log("Play");
+                this.lastPlayTime = now;
+
+              }
+            }
+          }
+          
         }
       },
     });
