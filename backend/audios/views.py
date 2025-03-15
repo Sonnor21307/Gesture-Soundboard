@@ -74,6 +74,8 @@ def delete_gesture(request,username,gesture):
     gesture.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
+#ignore me
+
 
 
 
