@@ -55,47 +55,69 @@ export class RecognizerComponent {
 
 
 
-  isThumbsUpHorizontal(landmarks: { x: number; y: number; z: number }[]): boolean {
+  isThumbsUpHorizontal(landmarks: { x: number; y: number; z: number }[], handedness : any): boolean {
     if (!landmarks || landmarks.length < 21) return false;
 
+    const hand_position = handedness[0][0].categoryName
 
-    const thumbBase = landmarks[0];
     const thumbStart = landmarks[1];
-    const thumbMid1 = landmarks[2];
-    const thumbMid2 = landmarks[3];
     const thumbTip = landmarks[4];
-
-    const indexJoint1 = landmarks[6]
-    const middleJoint1 = landmarks[10]
-    const ringJoint1 = landmarks[14]
-    const pinkyJoint1 = landmarks[18]
-
-    const indexKnuckle = landmarks[5]
-    const middleKnuckle = landmarks[9]
-    const ringKnuckle = landmarks[13]
-    const pinkyKnuckle = landmarks[17]
-
-    const indexTip = landmarks[8];
-    const middleTip = landmarks[12];
-    const ringTip = landmarks[16];
-    const pinkyTip = landmarks[20];
-
-    const thumbExtended =
-      thumbTip.x < thumbMid2.x &&
-      thumbMid2.x < thumbMid1.x &&
-      thumbMid1.x < thumbStart.x;
 
     const thumbHorizontal =
       Math.abs(thumbTip.y - thumbStart.y) < 0.2;
 
-    // check if first joint is lower than second knuckle
-    const fingersCurled =
-        indexJoint1.y > indexKnuckle.y &&
-        middleJoint1.y > middleKnuckle.y &&
-        ringJoint1.y > ringKnuckle.y &&
-        pinkyJoint1.y > pinkyKnuckle.y
+    var thumbExtended = false
+    var fingersCurled = true
+
+    var fingers = this.getFingerMap(landmarks, hand_position)
+    if(fingers.get("thumb") == "extended") thumbExtended = true
+    if(fingers.get("index") != "folded") fingersCurled = false
+    if(fingers.get("middle") != "folded") fingersCurled = false
+    if(fingers.get("ring") != "folded") fingersCurled = false
+    if(fingers.get("pinky") != "folded") fingersCurled = false
 
     return thumbExtended && thumbHorizontal && fingersCurled;
+  }
+
+  getFingerMap(landmarks: { x: number; y: number; z: number }[], handedness : string): Map<string,string> {
+    const fingers = new Map<string,string>()
+    fingers.set("thumb", this.isThumbFolded(landmarks.slice(1,5), handedness))
+    fingers.set("index", this.fingerFolded(landmarks[6].y, landmarks[8].y))
+    fingers.set("middle", this.fingerFolded(landmarks[10].y, landmarks[12].y))
+    fingers.set("ring", this.fingerFolded(landmarks[14].y, landmarks[16].y))
+    fingers.set("pinky", this.fingerFolded(landmarks[18].y, landmarks[20].y))
+    console.log(fingers)
+    return fingers
+  }
+
+  isThumbFolded(landmarks: { x: number; y: number; z: number }[], handedness : string): string {
+    if(handedness == "Right"){
+      if(
+      landmarks[3].x < landmarks[2].x &&
+      landmarks[2].x < landmarks[1].x &&
+      landmarks[1].x < landmarks[0].x)
+      {
+        return "folded"
+      }else{
+        return "extended"
+      }
+    }else{
+      if(
+      landmarks[3].x > landmarks[2].x &&
+      landmarks[2].x > landmarks[1].x &&
+      landmarks[1].x > landmarks[0].x)
+      {
+        return "folded"
+      }else{
+        return "extended"
+      }
+    }
+
+  }
+
+  fingerFolded(knuckle: number, tip: number): string{
+    if(tip < knuckle) return "extended"
+    return "folded"
   }
 
 
@@ -130,10 +152,10 @@ export class RecognizerComponent {
             // console.log(truncatedLandmarks[8].y, truncatedLandmarks[0].y)
             // console.log(truncatedLandmarks);
 
-            if (this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0])) {
+            if (this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0], gestureRecognitionResult.handedness)) {
               this.recognizedGesture = 'horizontal thumbs up';
             }
-            console.log(this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0]))
+            // console.log(this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0]))
           } else {
             console.log("what happened");
             // try faster again
