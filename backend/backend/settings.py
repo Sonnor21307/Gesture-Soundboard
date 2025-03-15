@@ -53,9 +53,12 @@ CORS_ALLOW_METHODS = (
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders",
+    "audios.apps.AudiosConfig",
     "backend.apps.MongoAdminConfig",
     "backend.apps.MongoAuthConfig",
     "backend.apps.MongoContentTypesConfig",
+    'rest_framework',
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
@@ -63,9 +66,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
