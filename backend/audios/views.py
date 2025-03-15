@@ -52,8 +52,8 @@ def upload_gesture(request,username):
     audio_name = request.data.get('audio_name')
     user = User.objects.get(username=username)
     audio = user.audio_set.get(name=audio_name)
-    if(audio.gesture_set.filter(name=gesture).exists()):
-        gesture = audio.gesture_set.get(name=gesture)
+    if(audio.gesture_set.filter(gesture=gesture).exists()):
+        gesture = audio.gesture_set.get(gesture=gesture)
         gesture.gesture = gesture
         gesture.save()
         return Response({"url": base_url + audio.file}, status=status.HTTP_201_CREATED)
