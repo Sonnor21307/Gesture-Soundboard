@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {Audio, Gesture} from "../models/models";
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { Audio, Gesture } from "../models/models";
 
 @Injectable({
   providedIn: 'root'
@@ -12,24 +12,20 @@ export class GesturesService {
   constructor(private http: HttpClient) {
   }
   public addGesture(username : string, audio_file: string, gesture : string) {
-    // this.deleteGesture(username, gesture).subscribe(response => {
-    //   console.log("deleting");
-    //   var fd = new FormData()
-    //   fd.append('audio_name',audio_file)
-    //   fd.append('gesture', gesture)
-    //   console.log(username, gesture, audio_file);
-    //   return this.http.post<Gesture>(
-    //     `${this.apiUrl}gesture/${username}/create`, fd
-    //   )
-    // }, error => {
-    //   console.error('Failed to delete gesture', error);
-    // });
-    
     var fd = new FormData()
     fd.append('audio_name',audio_file)
     fd.append('gesture', gesture)
     return this.http.post<Gesture>(
       `${this.apiUrl}gesture/${username}/create`, fd
+    )
+  }
+
+  public updateGesture(username: string, audio_file: string, gesture: string) {
+    var fd = new FormData()
+    fd.append('audio_name',audio_file)
+    fd.append('gesture', gesture)
+    return this.http.put<Gesture>(
+      `${this.apiUrl}gesture/${username}/update`, fd
     )
   }
 
