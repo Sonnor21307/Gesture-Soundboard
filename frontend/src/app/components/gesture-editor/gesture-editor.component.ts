@@ -47,21 +47,25 @@ export class GestureEditorComponent {
     if (selectedAudio === "") {
       this.gestureService.deleteGesture(username, gestureInfo.gesture).subscribe(response => {
         console.log('Deleted', response);
+        this.fetchGestures();
       }, error => {
         alert('Failed to delete gesture, check console for more information.');
         console.error('Failed to delete gesture', error);
       });
     } else {
       let oldValue: string | undefined = undefined;
+      let existingObject: Gesture;
       for (const existingGesture of this.gestures) {
         if (existingGesture.gesture === gestureInfo.gesture) {
           oldValue = existingGesture.audio_name;
+          existingObject = existingGesture;
         }
       }
 
       if (oldValue !== undefined && oldValue.length > 0) {
         this.gestureService.updateGesture(username, selectedAudio, gestureInfo.gesture).subscribe(response => {
           console.log('Updated', response);
+          existingObject.gesture = gestureInfo.gesture;
         }, error => {
           alert('Failed to update gesture, check console for more information.');
           console.error('Failed to update gesture', error);
@@ -69,6 +73,7 @@ export class GestureEditorComponent {
       } else {
         this.gestureService.addGesture(username, selectedAudio, gestureInfo.gesture).subscribe(response => {
           console.log('Added', response);
+          this.fetchGestures();
         }, error => {
           alert('Failed to add gesture audio, check console for more information.');
           console.error('Failed to add gesture', error);
@@ -86,20 +91,9 @@ export class GestureEditorComponent {
     this.audioService.playAudio(url);
   }
 
-  ngOnInit() {
+  fetchGestures() {
     const username = this.authService.getUsername();
-    if (!username) {
-      console.log("no user");
-      return;
-    }
-
-    this.createForm();
-    this.gestureService.getAudios(username).subscribe(response => {
-      this.audios = response;
-      console.log('Got', response);
-    }, error => {
-      console.error('Failed to get audios', error);
-    });
+    if (!username) return;
 
     this.gestureService.getGestures(username).subscribe(response => {
       this.gestures = response;
@@ -126,6 +120,24 @@ export class GestureEditorComponent {
     }, error => {
       console.error('Failed to get gestures', error);
     });
+  }
+
+  ngOnInit() {
+    const username = this.authService.getUsername();
+    if (!username) {
+      console.log("no user");
+      return;
+    }
+
+    this.createForm();
+    this.gestureService.getAudios(username).subscribe(response => {
+      this.audios = response;
+      console.log('Got', response);
+    }, error => {
+      console.error('Failed to get audios', error);
+    });
+
+    this.fetchGestures();
   }
 
   private createForm() {
