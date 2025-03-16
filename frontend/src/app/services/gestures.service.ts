@@ -7,16 +7,27 @@ import {Audio, Gesture} from "../models/models";
   providedIn: 'root'
 })
 export class GesturesService {
-  apiUrl = "https://gesture-soundboard.vercel.app/"
+  apiUrl = "http://127.0.0.1:8000/"
 
   constructor(private http: HttpClient) {
   }
-
-  public addGesture(username : string, audio_file: string, gesture : string){
+  public addGesture(username : string, audio_file: string, gesture : string) {
+    // this.deleteGesture(username, gesture).subscribe(response => {
+    //   console.log("deleting");
+    //   var fd = new FormData()
+    //   fd.append('audio_name',audio_file)
+    //   fd.append('gesture', gesture)
+    //   console.log(username, gesture, audio_file);
+    //   return this.http.post<Gesture>(
+    //     `${this.apiUrl}gesture/${username}/create`, fd
+    //   )
+    // }, error => {
+    //   console.error('Failed to delete gesture', error);
+    // });
+    
     var fd = new FormData()
     fd.append('audio_name',audio_file)
     fd.append('gesture', gesture)
-    console.log(username, gesture, audio_file);
     return this.http.post<Gesture>(
       `${this.apiUrl}gesture/${username}/create`, fd
     )

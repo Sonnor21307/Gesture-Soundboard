@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class AuthService {
-  apiUrl = 'https://gesture-soundboard.vercel.app/';
+  apiUrl = "http://127.0.0.1:8000/";
   constructor(private http: HttpClient) {}
 
   public logout() {

@@ -47,6 +47,7 @@ export class GestureEditorComponent {
     this.gestureService.addGesture(username, selectedAudio, gestureInfo.gesture).subscribe(response => {
       console.log('Added', response);
     }, error => {
+      alert('Failed to change audio, check console for more information.');
       console.error('Failed to add gesture', error);
     });
 
