@@ -7,7 +7,7 @@ import { Audio, Gesture } from "../models/models";
   providedIn: 'root'
 })
 export class GesturesService {
-  apiUrl = "http://127.0.0.1:8000/"
+  apiUrl = "https://gesture-soundboard.vercel.app/"
 
   constructor(private http: HttpClient) {
   }
