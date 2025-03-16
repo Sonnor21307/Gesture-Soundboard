@@ -18,8 +18,6 @@ export class RecognizerComponent {
   private camera!: Camera;
   private gestureRecognizer!: GestureRecognizer;
   cameraOn = false;
-  lastPlayTime = 0;
-  recognizedGesture = "none";
   gestures: Gesture[] = [];
 
   constructor(private gestureService: GesturesService, private audioService: AudioService, private authService: AuthService) {}
@@ -140,69 +138,68 @@ export class RecognizerComponent {
   }
 
 
-  lastProcessedTime = 0;
-  debounceTime = 1000;
-  private async initCamera() {
-    this.camera = new Camera(this.videoElement.nativeElement, {
-      onFrame: async () => {
-        const now = performance.now();
-        if (now - this.lastProcessedTime >= this.debounceTime) {
-          this.recognizedGesture = "none";
-          this.lastProcessedTime = now;
-          const gestureRecognitionResult = this.gestureRecognizer.recognize(this.videoElement.nativeElement);
-          let gestureFound = false;
+lastProcessedTime = 0;
+lastGesture = "none";
+debounceTime = 1000;
+lastPlayTime = 0;
+currentPlayingGesture = "none";
 
-          for (let gesture of gestureRecognitionResult.gestures) {
-            if (gesture[0].score > 0.5 && gesture[0].categoryName != "None") {
-              console.log(gesture[0].categoryName)
-              gestureFound = true;
-              this.recognizedGesture = gesture[0].categoryName;
-            }
+private async initCamera() {
+  this.camera = new Camera(this.videoElement.nativeElement, {
+    onFrame: async () => {
+      const now = performance.now();
+      if (now - this.lastProcessedTime >= this.debounceTime) {
+        this.lastProcessedTime = now;
+        const gestureRecognitionResult = this.gestureRecognizer.recognize(this.videoElement.nativeElement);
+        let gestureFound = false;
+        let newGesture = "none";
+
+        for (let gesture of gestureRecognitionResult.gestures) {
+          if (gesture[0].score > 0.5 && gesture[0].categoryName !== "None") {
+            console.log(gesture[0].categoryName);
+            gestureFound = true;
+            newGesture = gesture[0].categoryName;
+            break;
           }
-
-          if (!gestureFound && gestureRecognitionResult.landmarks.length > 0) {
-            
-            const truncatedLandmarks = gestureRecognitionResult.landmarks[0].map((landmark, index) => ({
-              part: this.landmarkNames[index],
-              x: parseFloat(landmark.x.toFixed(2)),
-              y: parseFloat(landmark.y.toFixed(2)),
-              z: parseFloat(landmark.z.toFixed(2))
-            }));
-
-            // console.log(truncatedLandmarks[8].y, truncatedLandmarks[0].y)
-            // console.log(truncatedLandmarks);
-
-            if (this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0], gestureRecognitionResult.handedness)) {
-              this.recognizedGesture = 'Horizontal_Thumbs_Up';
-            }
-
-            // console.log(this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0]))
-          } else {
-            //console.log("no hand recognized");
-            // try faster again
-            this.lastProcessedTime = 0;
-          }
-
-          if (now - this.lastPlayTime > 2000) {
-            
-
-            for (const gesture of this.gestures) {
-              if (gesture.gesture === this.recognizedGesture) {
-                this.audioService.playAudio(gesture.url);
-                console.log("Play");
-                this.lastPlayTime = now;
-
-              }
-            }
-          }
-          
         }
-      },
-    });
 
-    this.camera.start();
-    this.cameraOn = true;
-  }
+        if (!gestureFound && gestureRecognitionResult.landmarks.length > 0) {
+          if (this.isThumbsUpHorizontal(gestureRecognitionResult.landmarks[0], gestureRecognitionResult.handedness)) {
+            newGesture = 'Horizontal_Thumbs_Up';
+          }
+        }
+
+        if (newGesture !== this.lastGesture) {
+          if (newGesture === "none") {
+            this.audioService.pauseAudio();
+            this.currentPlayingGesture = "none";
+          } else {
+            const gestureAudio = this.gestures.find(g => g.gesture === newGesture);
+            if (gestureAudio) {
+              this.audioService.playAudio(gestureAudio.url);
+              this.currentPlayingGesture = newGesture;
+            }
+          }
+          console.log('Gesture changed:', this.lastGesture, '->', newGesture);
+          this.lastGesture = newGesture;
+        }
+      }
+    },
+  });
+
+  this.camera.start();
+  this.cameraOn = true;
+
+  this.audioService.onAudioEnded(() => {
+    if (this.currentPlayingGesture !== "none" && this.currentPlayingGesture === this.lastGesture) {
+      const gestureAudio = this.gestures.find(g => g.gesture === this.currentPlayingGesture);
+      if (gestureAudio) {
+        this.audioService.playAudio(gestureAudio.url);
+      }
+    }
+  });
+}
+
 
 
 }

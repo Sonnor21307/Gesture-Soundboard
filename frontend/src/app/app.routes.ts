@@ -7,4 +7,6 @@ export const routes: Routes = [
     { path: 'auth', component: AuthComponent },
     { path: 'gestures', component: GestureEditorComponent },
     { path: 'recognizer', component: RecognizerComponent },
+    { path: '', redirectTo: '/auth', pathMatch: 'full' },
+
 ];
