@@ -79,7 +79,6 @@ export class AuthComponent {
     const { username, password } = this.authForm.value;
 
     if (this.isLogin) {
-      console.log('Logging in:', { username, password });
       this.authService.login(username, password).subscribe(
         (response) => {
           localStorage.setItem('username', username); 
@@ -87,12 +86,11 @@ export class AuthComponent {
           window.location.reload();
         },
         (error) => {
-          alert('Something went wrong');
+          alert('Your username or password is incorrect.');
           console.error('Login failed', error);
         }
       );
     } else {
-      console.log('Signing up:', { username, password });
       this.authService.register(username, password).subscribe(
         (response) => {
           console.log('Registration successful', response);
@@ -100,7 +98,7 @@ export class AuthComponent {
           this.toggleAuth();
         },
         (error) => {
-          alert('Registration failed. Check console for errors.');
+          alert('Username is already in use.');
           console.error('Registration failed', error);
         }
       );
