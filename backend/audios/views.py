@@ -42,30 +42,21 @@ def get_gestures(request,username):
     user = User.objects.get(username=username)
     list_of_gestures = list()
     for gesture in user.gesture_set.all():
-        list_of_gestures.append({"gesture": gesture.gesture, "audio_name":gesture.audio.name, "url": base_url + gesture.audio.file})
+        list_of_gestures.append({"gesture": gesture.gesture, "audio_name":gesture.audio_name.split('&')[1], "url": base_url + gesture.audio_name})
     return Response(list_of_gestures, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def upload_gesture(request,username):
-    print("Upload gesture called")
     gesture = request.data.get('gesture')
     audio_name = request.data.get('audio_name')
     user = User.objects.get(username=username)
-    audio = user.audio_set.get(name=audio_name)
-    print("UNO:", gesture, audio_name, user, audio)
-    if(audio.gesture_set.filter(gesture=gesture).exists()):
-        gesture = audio.gesture_set.get(gesture=gesture)
-        gesture.gesture = gesture
-        gesture.save()
-        return Response({"url": base_url + audio.file}, status=status.HTTP_201_CREATED)
-    # if(audio.gesture_set.filter(gesture=gesture).exists()):
-    #     gesture = audio.gesture_set.get(gesture=gesture)
-    #     gesture.gesture = gesture
-    #     gesture.save()
-    #     return Response({"url": base_url + audio.file}, status=status.HTTP_201_CREATED)
-    audio.gesture_set.create(gesture=gesture, user=user)
-    return Response({"url": base_url + audio.file}, status=status.HTTP_201_CREATED)
+    name = user.username + "&" + audio_name
+    try:
+        user.gesture_set.create(gesture=gesture, audio_name=name)
+    except Exception as e:
+        return Response({"error": "Gesture " + gesture + " already exists for user"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"url": base_url + name, "audio_name":name.split('&')[1], "gesture":gesture}, status=status.HTTP_201_CREATED)
 
 @api_view(['DELETE'])
 def delete_gesture(request,username,gesture):
@@ -77,6 +68,20 @@ def delete_gesture(request,username,gesture):
         print(e)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['PUT'])
+def update_gesture(request,username):
+    gesture_name = request.data.get('gesture')
+    audio_name = request.data.get('audio_name')
+    user = User.objects.get(username=username)
+    gesture = user.gesture_set.get(gesture=gesture_name)
+    name = user.username + "&" + audio_name
+    try:
+        gesture.audio_name = name
+        gesture.save()
+    except Exception as e:
+        return Response({"error": "Failed to update gesture"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"url": base_url + name, "audio_name":audio_name, "gesture":gesture.gesture}, status=status.HTTP_201_CREATED)
+
 @api_view(['POST'])
 def upload_audio(request, username):
     audio_file = request.data.get('audio')
@@ -86,18 +91,12 @@ def upload_audio(request, username):
     client = storage.Client(credentials=credentials, project=creds["project_id"])
 
     bucket = client.get_bucket('audio21307')
-    filename = username + "&" + str(audio_file)
+    filename = username + "&" + audio_name
     blob = bucket.blob(filename)
     blob.upload_from_file(file_obj=audio_file, content_type='audio/mpeg')
 
     user = User.objects.get(username=username)
-    if(user.audio_set.filter(name=audio_name).exists()):
-        audio = user.audio_set.filter(name=audio_name)
-        audio.name = audio_name
-        audio.file = audio_file
-        audio.save()
-        return Response({"url": base_url + filename, "audio_name":audio_name}, status=status.HTTP_201_CREATED)
-    user.audio_set.create(name=audio_name, file=filename)
+    user.audio_set.create(name=filename)
 
     return Response({"url": base_url + filename, "audio_name":audio_name}, status=status.HTTP_201_CREATED)
 
@@ -107,15 +106,16 @@ def get_audios(request,username):
     audios = user.audio_set.all()
     list_of_audios = list()
     for audio in audios:
-        list_of_audios.append({"audio_name": audio.name, "url": base_url + audio.file})
+        name = audio.name.split("&")[1]
+        list_of_audios.append({"audio_name": name, "url": base_url + audio.name})
     return Response(list_of_audios, status=status.HTTP_200_OK)
 
 
 @api_view(['DELETE'])
 def delete_audio(request,username,audio_name):
     user = User.objects.get(username=username)
-    audio = user.audio_set.get(name=audio_name)
-    filename = audio.file
+    filename = username + "&" + audio_name
+    audio = user.audio_set.get(name=filename)
     credentials = service_account.Credentials.from_service_account_info(creds)
     client = storage.Client(credentials=credentials, project=creds["project_id"])
     bucket = client.get_bucket('audio21307')
