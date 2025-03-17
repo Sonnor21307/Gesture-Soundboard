@@ -91,6 +91,19 @@ export class GestureEditorComponent {
     this.audioService.playAudio(url);
   }
 
+  deleteAudio(audioName: string) {
+    const username = this.authService.getUsername();
+    if (!username) return;
+
+    this.gestureService.deleteAudio(username, audioName).subscribe(response => {
+      console.log('Deleted', response);
+      window.location.reload();
+    }, error => {
+      alert('Failed to delete audio, check console for more information.');
+      console.error('Failed to delete audio', error);
+    });
+  }
+
   fetchGestures() {
     const username = this.authService.getUsername();
     if (!username) return;

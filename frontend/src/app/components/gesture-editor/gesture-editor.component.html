@@ -84,7 +84,14 @@
                 <p class="mt-1">You haven't uploaded any audio files.</p>
             } @else {
                 @for (audio of audios; track audio.audio_name) {
-                    <p (click)="playAudio(audio.url)" class="hover:bg-surface-alt/10 mb-2 cursor-pointer bg-surface-dark-alt px-4 py-2 rounded-full">- {{ audio.audio_name }}</p>
+                    <div (click)="playAudio(audio.url)" class="group flex w-full hover:bg-surface-alt/10 mb-2 cursor-pointer bg-surface-dark-alt px-4 py-2 rounded-full">
+                        <p class="text-center w-full">- {{ audio.audio_name }}</p>
+
+                        <svg (click)="deleteAudio(audio.audio_name)" class="hidden group-hover:block size-6 hover:text-red-500 hover:bg-surface-dark/50 rounded-full p-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    
                 }
             }
 
